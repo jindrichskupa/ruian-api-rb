@@ -1,18 +1,9 @@
 require 'sinatra'
 require 'json'
-require 'redis'
 require 'i18n'
 require 'pg'
 
 class RuianAPI < Sinatra::Base
-  def redis
-    @redis ||= Redis.new(
-               host: ENV.fetch('REDIS_HOST', 'localhost'),
-               port: ENV.fetch('REDIS_PORT', 6379),
-               db: ENV.fetch('REDIS_DB', 0),
-               password: ENV.fetch('REDIS_PASS', nil)
-             )
-  end
 
   def postgres
     @postgres ||= PG.connect(
