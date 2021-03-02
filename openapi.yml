@@ -1,0 +1,277 @@
+openapi: 3.0.1
+info:
+  title: RUIAN API
+  description: RUIAN JSON API
+  version: 0.0.1
+  contact:
+    name: "Jindrich Skupa"
+    url: https://github.com/jindrichskupa
+    email: jindrich.skupa@gmail.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+tags:
+ - name: Places
+servers:
+  - url: https://ruian2.eman.dev
+    description: Preview server
+  - url: http://127.0.0.1:4568
+    description: Local server
+
+paths:
+  /places:
+    get:
+      summary: "Search of places"
+      operationId: "GetPlacesListBySearch"
+      description: '-'
+      parameters:
+        # - $ref: "#/components/parameters/StreetName"
+        # - $ref: "#/components/parameters/CityName"
+        # - $ref: "#/components/parameters/CityPartName"
+        # - $ref: "#/components/parameters/Zip"
+        - $ref: "#/components/parameters/Search"
+        - $ref: "#/components/parameters/Limit"
+      responses:
+        "200":
+          $ref: '#/components/responses/Places'
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/NotAuthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalError"
+      tags:
+        - "Places"
+
+components:
+  parameters:
+    xApiToken:
+      name: "X-Api-Token"
+      in: "header"
+      required: true
+      schema:
+        type: "string"
+        example: "7EEF6E23-CBC0-425B-A513-206B71D1F2EC"
+    PlaceId:
+      name: "place_id"
+      in: "query"
+      description: "ObjectId"
+      schema:
+        $ref: "#/components/schemas/ObjectId"
+    StreetName:
+      name: "street_name"
+      in: "query"
+      description: "ObjectName"
+      schema:
+        $ref: "#/components/schemas/ObjectName"
+    StreetId:
+      name: "street_id"
+      in: "query"
+      description: "ObjectId"
+      schema:
+        $ref: "#/components/schemas/ObjectId"
+    CityId:
+      name: "city_id"
+      in: "query"
+      description: "ObjectId"
+      schema:
+        $ref: "#/components/schemas/ObjectId"
+    CityName:
+      name: "city_name"
+      in: "query"
+      description: "ObjectName"
+      schema:
+        $ref: "#/components/schemas/ObjectName"
+    CityPartId:
+      name: "city_part_id"
+      in: "query"
+      description: "ObjectId"
+      schema:
+        $ref: "#/components/schemas/ObjectId"
+    CityPartName:
+      name: "city_part_name"
+      in: "query"
+      description: "ObjectName"
+      schema:
+        $ref: "#/components/schemas/ObjectName"
+    Search:
+      name: "search"
+      in: "query"
+      description: "Search string"
+      schema:
+        $ref: "#/components/schemas/Search"
+    Limit:
+      name: "limit"
+      in: "query"
+      description: "Max results"
+      schema:
+        $ref: "#/components/schemas/Limit"
+    Zip:
+      name: "zip"
+      in: "query"
+      description: "ObjectId"
+      schema:
+        $ref: "#/components/schemas/ObjectId"
+
+  responses:
+    Places:
+      description: "Places"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Places'
+    Ok:
+      description: "Ok"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Ok"
+    Created:
+      description: "Created"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Created"
+    BadRequest:
+      description: "Bad request"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error4xx"
+    NotAuthorized:
+      description: "Not authorized"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error4xx"
+    Forbidden:
+      description: "Forbidden"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error4xx"
+    NotFound:
+      description: "Not found"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error4xx"
+    InternalError:
+      description: "Internal server error"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error500"
+  schemas:
+    ObjectId:
+      type: "integer"
+      example: 1234567
+    ObjectName:
+      type: "string"
+      example: "Lhota"
+    Search:
+      type: "string"
+      example: "Sen%202%20zruc"
+    Place:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+          example: 200
+        e:
+          type: "string"
+          example: "20"
+        p:
+          type: "string"
+          example: "20"
+        o:
+          type: "string"
+          example: "1A"
+        street:
+          type: "string"
+          example: "Senecká"
+        street_id:
+          type: "number"
+          example: 111
+        city:
+          type: "string"
+          example: "Zruč-Senec"
+        city_id:
+          type: "number"
+          example: 111
+        city_part:
+          type: "string"
+          example: Senec
+        city_part_id:
+          type: "number"
+          example: 111
+        zip:
+          type: "string"
+          example: "33008"
+        address:
+          type: "string"
+          example: "Senecká 11, Senec, Zruč-Senec, 33008"
+    Places:
+      type: "array"
+      items:
+        $ref: "#/components/schemas/Place"
+    Limit:
+      type: "number"
+      example: 100
+    Ok:
+      type: "object"
+      properties:
+        code:
+          type: "integer"
+          format: "int64"
+          example: 200
+        result:
+          type: "string"
+    Created:
+      type: "object"
+      properties:
+        code:
+          type: "integer"
+          format: "int64"
+          example: 201
+        result:
+          type: "string"
+    Error4xx:
+      type: "object"
+      properties:
+        code:
+          type: integer
+          example: 400
+        errorDescription:
+          type: string
+          example: "Error description"
+        errors:
+          type: "array"
+          items:
+            $ref:  "#/components/schemas/Errors"
+          example:
+            - Error 1
+    Errors:
+      type: string
+      enum:
+        - "Error 1"
+        - "Error 2"
+      example: Error 1
+    Error500:
+      type: "object"
+      properties:
+        code:
+          type: "integer"
+          format: "int64"
+          example: 500
+        errorDescription:
+          type: "string"
+          example: "Internal Server Error"
+      xml:
+        name: "Error"
