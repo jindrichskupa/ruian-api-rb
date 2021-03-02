@@ -4,19 +4,14 @@ API to search RUIAN via REST/JSON API
 
 ## Technology
 
-* redis
 * postgres + postgis
 * sinatra
 * puma
 
 ## Configuration
 
-The only configuration is REDIS and PostgreSQL access:
+The only configuration is PostgreSQL access:
 
-* `REDIS_HOST`: redis
-* `REDIS_PORT`: 6379
-* `REDIS_DB`: 0
-* `CACHE_TTL`: 3600
 * `POSTGRES_HOST`: postgres
 * `POSTGRES_PORT`: 5432
 * `POSTGRES_DB`: ruian
