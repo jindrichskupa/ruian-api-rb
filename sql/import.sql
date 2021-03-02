@@ -3,23 +3,6 @@ SET datestyle = "ISO, DMY";
 CREATE EXTENSION IF NOT EXISTS "unaccent";
 CREATE EXTENSION IF NOT EXISTS "pg_trgm";
 
-CREATE OR REPLACE FUNCTION to_ascii (bytea, name)
-  RETURNS text STRICT
-  AS 'to_ascii_encname'
-  LANGUAGE internal;
-
-CREATE OR REPLACE FUNCTION lower (text)
-  RETURNS text
-  LANGUAGE internal
-  IMMUTABLE STRICT
-  AS $function$lower$function$;
-
-CREATE OR REPLACE FUNCTION lower (anyrange)
-  RETURNS anyelement
-  LANGUAGE internal
-  IMMUTABLE STRICT
-  AS $function$range_lower$function$;
-
 CREATE OR REPLACE FUNCTION to_search (text)
   RETURNS text
   LANGUAGE SQL
