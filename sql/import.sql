@@ -26,7 +26,7 @@ CREATE OR REPLACE FUNCTION to_search (text)
   IMMUTABLE STRICT
   AS $$
   SELECT
-    regexp_replace(regexp_replace(regexp_replace(lower(to_ascii(convert_to($1, 'latin2'), 'latin2')), '-', ' '), '\.', ' ', 'g'), '\s+', ' ', 'g')
+    unaccent($1)
 $$;
 
 -- odstraneni tabulky pro adresni mista primo z CSV
