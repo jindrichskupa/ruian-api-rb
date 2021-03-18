@@ -1,7 +1,11 @@
 SET datestyle = "ISO, DMY";
 
+CREATE EXTENSION IF NOT EXISTS "cube";
+CREATE EXTENSION IF NOT EXISTS "earthdistance";
 CREATE EXTENSION IF NOT EXISTS "unaccent";
 CREATE EXTENSION IF NOT EXISTS "pg_trgm";
+CREATE EXTENSION IF NOT EXISTS "postgis";
+CREATE EXTENSION IF NOT EXISTS "postgis_topology";
 
 CREATE OR REPLACE FUNCTION to_search (text)
   RETURNS text
@@ -85,16 +89,14 @@ SELECT
   import_address_places.street_name AS name,
   to_search (import_address_places.street_name) AS name_search,
   import_address_places.city_id,
-  import_address_places.city_part_id,
-  import_address_places.zip
+  import_address_places.city_part_id
 FROM
   import_address_places
 GROUP BY
   import_address_places.street_id,
   import_address_places.street_name,
   import_address_places.city_id,
-  import_address_places.city_part_id,
-  zip;
+  import_address_places.city_part_id;
 
 -- odstraneni view pro adresni mista
 DROP MATERIALIZED VIEW IF EXISTS view_address_places;
@@ -121,10 +123,11 @@ SELECT
   END AS o,
   import_address_places.city_id AS cities_id,
   import_address_places.city_part_id AS city_parts_id,
-  import_address_places.zip
+  import_address_places.zip,
+  ST_Y(ST_Transform(ST_MakePoint(-1*x,-1*y), '+init=epsg:5514 +towgs84=570.8,85.7,462.8,4.998,1.587,5.261,3.56', '+init=epsg:4326')) as lat,
+  ST_X(ST_Transform(ST_MakePoint(-1*x,-1*y), '+init=epsg:5514 +towgs84=570.8,85.7,462.8,4.998,1.587,5.261,3.56', '+init=epsg:4326')) as long
 FROM
-  import_address_places
-  LEFT JOIN view_address_streets ON view_address_streets.id = import_address_places.street_id;
+  import_address_places;
 
 DROP MATERIALIZED VIEW view_address_search;
 
@@ -141,6 +144,8 @@ SELECT
   view_address_places.cities_id as city_id,
   view_address_cities.name as city_name,
   view_address_places.zip as zip,
+  view_address_places.lat as lat,
+  view_address_places.long as long,
   CASE
     WHEN view_address_streets.name is NULL THEN
       view_address_city_parts.name
@@ -194,7 +199,7 @@ SELECT
     view_address_places.zip
   ) as address_search
 from view_address_places
-  left join view_address_streets on view_address_places.streets_id = view_address_streets.id
+  left join view_address_streets on view_address_places.streets_id = view_address_streets.id and view_address_places.city_parts_id = view_address_streets.city_part_id
   left join view_address_cities on view_address_places.cities_id = view_address_cities.id
   left join view_address_city_parts on view_address_places.city_parts_id = view_address_city_parts.id;
 
@@ -226,13 +231,17 @@ DROP INDEX IF EXISTS index_address_places_on_city_id;
 
 CREATE INDEX index_address_places_on_city_id ON view_address_places USING btree (cities_id);
 
-DROP INDEX IF EXISTS index_address_places_on_lat_lng;
+DROP INDEX IF EXISTS index_address_places_on_lat_long;
 
-CREATE INDEX index_address_places_on_lat_lng ON view_address_places USING gist (ll_to_earth (latitude, longitude));
+CREATE INDEX index_address_places_on_lat_lng ON view_address_places USING gist (ll_to_earth (lat, long));
+
+DROP INDEX IF EXISTS index_view_address_search_on_lat_lng;
+
+CREATE INDEX index_view_address_search_on_lat_lng ON view_address_search USING gist (ll_to_earth (lat, long));
 
 DROP INDEX IF EXISTS index_address_places_on_point;
 
-CREATE INDEX index_address_places_on_point ON view_address_places USING gist (point(latitude, longitude));
+CREATE INDEX index_address_places_on_point ON view_address_places USING gist (point(lat, long));
 
 DROP INDEX IF EXISTS index_address_cities_on_name_search;
 

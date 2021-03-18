@@ -26,11 +26,32 @@ paths:
       operationId: "GetPlacesListBySearch"
       description: '-'
       parameters:
-        # - $ref: "#/components/parameters/StreetName"
-        # - $ref: "#/components/parameters/CityName"
-        # - $ref: "#/components/parameters/CityPartName"
-        # - $ref: "#/components/parameters/Zip"
         - $ref: "#/components/parameters/Search"
+        - $ref: "#/components/parameters/Limit"
+      responses:
+        "200":
+          $ref: '#/components/responses/Places'
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/NotAuthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalError"
+      tags:
+        - "Places"
+  /location:
+    get:
+      summary: "Search of places by GPS coordinates"
+      operationId: "GetPlacesListByCoordinates"
+      description: '-'
+      parameters:
+        - $ref: "#/components/parameters/Lat"
+        - $ref: "#/components/parameters/Long"
+        - $ref: "#/components/parameters/Range"
         - $ref: "#/components/parameters/Limit"
       responses:
         "200":
@@ -57,66 +78,36 @@ components:
       schema:
         type: "string"
         example: "7EEF6E23-CBC0-425B-A513-206B71D1F2EC"
-    PlaceId:
-      name: "place_id"
-      in: "query"
-      description: "ObjectId"
-      schema:
-        $ref: "#/components/schemas/ObjectId"
-    StreetName:
-      name: "street_name"
-      in: "query"
-      description: "ObjectName"
-      schema:
-        $ref: "#/components/schemas/ObjectName"
-    StreetId:
-      name: "street_id"
-      in: "query"
-      description: "ObjectId"
-      schema:
-        $ref: "#/components/schemas/ObjectId"
-    CityId:
-      name: "city_id"
-      in: "query"
-      description: "ObjectId"
-      schema:
-        $ref: "#/components/schemas/ObjectId"
-    CityName:
-      name: "city_name"
-      in: "query"
-      description: "ObjectName"
-      schema:
-        $ref: "#/components/schemas/ObjectName"
-    CityPartId:
-      name: "city_part_id"
-      in: "query"
-      description: "ObjectId"
-      schema:
-        $ref: "#/components/schemas/ObjectId"
-    CityPartName:
-      name: "city_part_name"
-      in: "query"
-      description: "ObjectName"
-      schema:
-        $ref: "#/components/schemas/ObjectName"
     Search:
       name: "search"
       in: "query"
       description: "Search string"
       schema:
         $ref: "#/components/schemas/Search"
+    Lat:
+      name: "lat"
+      in: "query"
+      description: "Latitude"
+      schema:
+        $ref: "#/components/schemas/Coordinate"
+    Long:
+      name: "long"
+      in: "query"
+      description: "Longitude"
+      schema:
+        $ref: "#/components/schemas/Coordinate"
+    Range:
+      name: "range"
+      in: "query"
+      description: "Location search range"
+      schema:
+        $ref: "#/components/schemas/Range"
     Limit:
       name: "limit"
       in: "query"
       description: "Max results"
       schema:
         $ref: "#/components/schemas/Limit"
-    Zip:
-      name: "zip"
-      in: "query"
-      description: "ObjectId"
-      schema:
-        $ref: "#/components/schemas/ObjectId"
 
   responses:
     Places:
@@ -125,18 +116,6 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Places'
-    Ok:
-      description: "Ok"
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/Ok"
-    Created:
-      description: "Created"
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/Created"
     BadRequest:
       description: "Bad request"
       content:
@@ -217,13 +196,28 @@ components:
         address:
           type: "string"
           example: "Senecká 11, Senec, Zruč-Senec, 33008"
+        lat:
+          type: "number"
+          example: 49.7986463795274
+        long:
+          type: "number"
+          example: 13.4184756354447
+        distance:
+          type: "number"
+          example: 30.321
     Places:
       type: "array"
       items:
         $ref: "#/components/schemas/Place"
     Limit:
-      type: "number"
+      type: "integer"
       example: 100
+    Range:
+      type: "integer"
+      example: 100
+    Coordinate:
+      type: "number"
+      example: 12.12321
     Ok:
       type: "object"
       properties:
