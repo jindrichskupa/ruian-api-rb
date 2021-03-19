@@ -1,0 +1,31 @@
+Project RUIAN {
+    database_type: 'PostgreSQL'
+    note: '''
+        # RUIAN search DB
+        **markdown content here**
+    '''
+}
+
+Table "address_search" {
+  "id" integer [note: "Address place RUIAN ID"]
+  "p" "character varying"
+  "o" text
+  "e" "character varying"
+  "street_id" integer [note: "Street RUIAN ID"]
+  "street_name" "character varying(255)"
+  "city_part_id" integer [note: "City part RUIAN ID"]
+  "city_part_name" "character varying(255)"
+  "city_id" integer [note: "City RUIAN ID"]
+  "city_name" "character varying(255)"
+  "zip" "character varying(255)" [note: "Postal code"]
+  "lat" float8 [note: "GPS latitude"]
+  "long" float8 [note: "GPS longitude"]
+  "address" text [note: "Full address line"]
+  "address_search" text [note: "Full address line for trgm based search"]
+  
+  Indexes {
+    (lat, long) [name: 'index_address_search_on_lat_lng'] // 'gist (ll_to_earth (lat, long))'
+    address_search [name: 'index_address_search_address_search'] // 'gin (address_search gin_trgm_ops)'
+    id [unique]
+  }
+}
