@@ -54,6 +54,10 @@ class RuianAPI < Sinatra::Base
     @record_expire ||= ENV.fetch('CACHE_TTL', 3600)
   end
 
+  before do
+    content_type 'application/json'
+  end
+
   set :json_encoder, :to_json
 
   get '/places' do
@@ -62,8 +66,9 @@ class RuianAPI < Sinatra::Base
 
     query = '%' + I18n.transliterate(params[:search]).to_s.downcase.gsub(/[^a-z0-9]/,' ').gsub(/\s+/, '%') + '%'
     limit = params[:limit].to_i || 10
-
-    return places_search_query(query, limit).to_json
+    result = places_search_query(query, limit)
+    status (result.empty? ? 404 : 200)
+    result.to_json
   end
 
   get '/location' do
@@ -72,7 +77,9 @@ class RuianAPI < Sinatra::Base
     limit = params[:limit].to_i || 10
     range = params[:range].to_i || 50
 
-    return place_by_coordinates(lat, long, limit, range).to_json
+    result place_by_coordinates(lat, long, limit, range)
+    status (result.empty? ? 404 : 200)
+    result.to_json
   end
 
   get '/openapi.yml' do
