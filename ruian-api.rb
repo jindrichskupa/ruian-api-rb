@@ -66,7 +66,9 @@ class RuianAPI < Sinatra::Base
 
     query = '%' + I18n.transliterate(params[:search]).to_s.downcase.gsub(/[^a-z0-9]/,' ').gsub(/\s+/, '%') + '%'
     limit = params[:limit].to_i || 10
+
     result = places_search_query(query, limit)
+
     status (result.empty? ? 404 : 200)
     result.to_json
   end
@@ -77,7 +79,8 @@ class RuianAPI < Sinatra::Base
     limit = params[:limit].to_i || 10
     range = params[:range].to_i || 50
 
-    result place_by_coordinates(lat, long, limit, range)
+    result = place_by_coordinates(lat, long, limit, range)
+
     status (result.empty? ? 404 : 200)
     result.to_json
   end
